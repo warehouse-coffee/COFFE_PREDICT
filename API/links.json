@@ -1,0 +1,198 @@
+{
+    "CrudeOil": [
+        "https://tradingeconomics.com/commodity/crude-oil",
+        "Crude Oil"
+    ],
+    "Brent": [
+        "https://tradingeconomics.com/commodity/brent-crude-oil",
+        "Brent"
+    ],
+    "NaturalGas": [
+        "https://tradingeconomics.com/commodity/natural-gas",
+        "Natural gas"
+    ],
+    "Gasoline": [
+        "https://tradingeconomics.com/commodity/gasoline",
+        "Gasoline"
+    ],
+    "HeatingOil": [
+        "https://tradingeconomics.com/commodity/heating-oil",
+        "Heating Oil"
+    ],
+    "Coal": [
+        "https://tradingeconomics.com/commodity/coal",
+        "Coal"
+    ],
+    "TTFGas": [
+        "https://tradingeconomics.com/commodity/eu-natural-gas",
+        "TTF Gas"
+    ],
+    "UKGas": [
+        "https://tradingeconomics.com/commodity/uk-natural-gas",
+        "UK Gas"
+    ],
+    "Ethanol": [
+        "https://tradingeconomics.com/commodity/ethanol",
+        "Ethanol"
+    ],
+    "Naphtha": [
+        "https://tradingeconomics.com/commodity/naphtha",
+        "Naphtha"
+    ],
+    "Propane": [
+        "https://tradingeconomics.com/commodity/propane",
+        "Propane"
+    ],
+    "Methanol": [
+        "https://tradingeconomics.com/commodity/methanol",
+        "Methanol"
+    ],
+    "UralsOil": [
+        "https://tradingeconomics.com/commodity/urals-oil",
+        "Urals Oil"
+    ],
+    "Gold": [
+        "https://tradingeconomics.com/commodity/gold",
+        "Gold"
+    ],
+    "Silver": [
+        "https://tradingeconomics.com/commodity/silver",
+        "Silver"
+    ],
+    "Copper": [
+        "https://tradingeconomics.com/commodity/copper",
+        "Copper"
+    ],
+    "Steel": [
+        "https://tradingeconomics.com/commodity/steel",
+        "Steel"
+    ],
+    "IronOre": [
+        "https://tradingeconomics.com/commodity/iron-ore",
+        "Iron Ore"
+    ],
+    "Platinum": [
+        "https://tradingeconomics.com/commodity/platinum",
+        "Platinum"
+    ],
+    "Titanium": [
+        "https://tradingeconomics.com/commodity/titanium",
+        "Titanium"
+    ],
+    "HRCSteel": [
+        "https://tradingeconomics.com/commodity/hrc-steel",
+        "HRC Steel"
+    ],
+    "Soybeans": [
+        "https://tradingeconomics.com/commodity/soybeans",
+        "Soybeans"
+    ],
+    "Wheat": [
+        "https://tradingeconomics.com/commodity/wheat",
+        "Wheat"
+    ],
+    "Lumber": [
+        "https://tradingeconomics.com/commodity/lumber",
+        "Lumber"
+    ],
+    "PalmOil": [
+        "https://tradingeconomics.com/commodity/palm-oil",
+        "Palm Oil"
+    ],
+    "Cheese": [
+        "https://tradingeconomics.com/commodity/cheese",
+        "Cheese"
+    ],
+    "Milk": [
+        "https://tradingeconomics.com/commodity/milk",
+        "Milk"
+    ],
+    "Rubber": [
+        "https://tradingeconomics.com/commodity/rubber",
+        "Rubber"
+    ],
+    "OrangeJuice": [
+        "https://tradingeconomics.com/commodity/orange-juice",
+        "Orange Juice"
+    ],
+    "Coffee": [
+        "https://tradingeconomics.com/commodity/coffee",
+        "Coffee"
+    ],
+    "Cotton": [
+        "https://tradingeconomics.com/commodity/cotton",
+        "Cotton"
+    ],
+    "Cocoa": [
+        "https://tradingeconomics.com/commodity/cocoa",
+        "Cocoa"
+    ],
+    "Rice": [
+        "https://tradingeconomics.com/commodity/rice",
+        "Rice"
+    ],
+    "Canola": [
+        "https://tradingeconomics.com/commodity/canola",
+        "Canola"
+    ],
+    "Oat": [
+        "https://tradingeconomics.com/commodity/oat",
+        "Oat"
+    ],
+    "Wool": [
+        "https://tradingeconomics.com/commodity/wool",
+        "Wool"
+    ],
+    "Sugar": [
+        "https://tradingeconomics.com/commodity/sugar",
+        "Sugar"
+    ],
+    "SunflowerOil": [
+        "https://tradingeconomics.com/commodity/sunflower-oil",
+        "Sunflower Oil"
+    ],
+    "Rapeseed": [
+        "https://tradingeconomics.com/commodity/rapeseed-oil",
+        "Rapeseed"
+    ],
+    "Butter": [
+        "https://tradingeconomics.com/commodity/butter",
+        "Butter"
+    ],
+    "Potatoes": [
+        "https://tradingeconomics.com/commodity/potatoes",
+        "Potatoes"
+    ],
+    "Corn": [
+        "https://tradingeconomics.com/commodity/corn",
+        "Corn"
+    ],
+    "FeederCattle": [
+        "https://tradingeconomics.com/commodity/feeder-cattle",
+        "Feeder Cattle"
+    ],
+    "LiveCattle": [
+        "https://tradingeconomics.com/commodity/live-cattle",
+        "Live Cattle"
+    ],
+    "LeanHogs": [
+        "https://tradingeconomics.com/commodity/lean-hogs",
+        "Lean Hogs"
+    ],
+    "Beef": [
+        "https://tradingeconomics.com/commodity/beef",
+        "Beef"
+    ],
+    "Poultry": [
+        "https://tradingeconomics.com/commodity/poultry",
+        "Poultry"
+    ],
+    "EggsCH": [
+        "https://tradingeconomics.com/commodity/eggs-ch",
+        "Eggs CH"
+    ],
+    "Salmon": [
+        "https://tradingeconomics.com/commodity/salmon",
+        "Salmon"
+    ]
+}
