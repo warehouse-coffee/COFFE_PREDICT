@@ -10,7 +10,7 @@ import traceback
 import schedule
 import numpy as np
 # from ..Network_lstm import Network_training, Network_running
-from API.crawl import CrawClass
+from API.crawl import CrawClass, London_US_CRAWL
 from Model.Utils import *
 from Model.Network_lstm import Network_training, Network_running
 

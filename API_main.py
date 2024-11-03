@@ -1,6 +1,6 @@
 from typing import Union
 from fastapi import FastAPI
-from API.crawl import CrawClass
+from API.crawl import CrawClass, London_US_CRAWL
 import json
 import datetime
 import time
@@ -8,6 +8,12 @@ import os
 import traceback
 from Model.Utils import *
 from Model.Network_lstm import Network_running
+import subprocess
+import psutil
+
+
+process = None  # Biến toàn cục để lưu tiến trình
+script_path = "console.py"
 
 app = FastAPI()
 f = open('API/links.json', 'r')
@@ -106,6 +112,7 @@ def train_status():
             "error": "cook"
         }
 
+
 @app.get("/predict")
 def predict():
     links_name = list(Links.keys())
@@ -149,3 +156,74 @@ def predict():
         "value": res[0][0],
         "accuracy": nwtwork.accuracy
     }
+
+
+@app.get("/London_US")
+def London_US():
+    now = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d')
+    current = time.time()
+    Data = {
+        "unix_time_now": int(current),
+        "date_now": now
+    }
+    try:
+        f = open('API/Data_api/London_US.json', 'r')
+        data = json.load(f)
+        f.close()
+        if (now != data["date_now"]):
+            os.remove('API/Data_api/London_US.json')
+            raise Exception("Fetch new Data")
+        else:
+            # SET TRAIN DATA
+            Data = data['data']
+            return Data
+    except:
+        crawl = London_US_CRAWL()
+        Data["data"] = crawl.Crawl()
+        f = open('API/Data_api/London_US.json', 'w')
+        json.dump(Data, f)
+        f.close()
+        return Data
+
+
+@app.get("/run_service")
+def run_script():
+    global process
+    if process is None:
+        process = subprocess.Popen(['py', script_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return {"message": "Script started", "pid": process.pid}
+
+@app.get('/restart_service')
+def restart_script():
+    global process
+    process = subprocess.Popen(['py', script_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return {"message": "Script started", "pid": process.pid}
+
+@app.get('/stop_service')
+def stop_script():
+    global process
+    if process is None:
+        return {"message": "No script running", "code": 404}
+    
+    proc_id = process.pid
+    # Kiểm tra xem tiến trình có đang chạy
+    if psutil.pid_exists(proc_id):
+        process.terminate()  # Dừng tiến trình
+        process.wait()  # Chờ tiến trình hoàn tất
+        process = None
+        return {"message": "Script stopped -> Process is None", "pid": proc_id}
+    else:
+        process = None
+        return {"message": "Process not running -> Process is None", "pid": proc_id}
+
+@app.get('/status_service')
+def check_status():
+    global process
+    if process is None:
+        return {"message": "No script running", "code": 404}
+
+    # Kiểm tra xem tiến trình có đang chạy không
+    if psutil.pid_exists(process.pid):
+        return {"status": "running", "pid": process.pid}
+    else:
+        return {"status": "finished", "pid": process.pid}
