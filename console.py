@@ -229,10 +229,16 @@ def Training_FUll():
     while accu < 70:
         accu = int(Training())
 
+def Main_func():
+    update()
+    Training_FUll()
+
 print(init())
 
-schedule.every().day.at("06:00").do(update)
-schedule.every().day.at("06:20").do(Training_FUll)
+# schedule.every().day.at("06:00").do(update)
+# schedule.every().day.at("06:20").do(Training_FUll)
+schedule.every().day.at("06:00").do(Main_func)
+
 while True:
     schedule.run_pending()
     time.sleep(1)
