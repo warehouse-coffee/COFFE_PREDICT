@@ -19,7 +19,6 @@ app = FastAPI()
 f = open('API/links.json', 'r')
 Links = json.load(f)
 f.close()
-links_name = list(Links.keys())
 
 trainObj = {}
 DataTrain = np.array([])
@@ -40,7 +39,16 @@ def Load_Data():
     global DataToday
     global train_now_date
     global train_now_unix
-    global date_obj_coffee
+
+    links_name = list(Links.keys())
+    train_now_date = 0
+    train_now_unix = 0
+    trainObj = {}
+    DataTrain = np.array([])
+    DataToday = np.array([])
+    length_min = 0
+    name = None
+
     f = open('Data/' + 'train' + '.json', 'r')
     data = json.load(f)
     f.close()
@@ -79,11 +87,15 @@ def Load_Data():
             scaler = scaler[:-1]
             scaler = scaler.reshape((-1, 1))
             DataTrain = np.concatenate((DataTrain, scaler), axis=1)
+    
+    print(DataTrain.shape)
 
 
 def SetLabel():
     global label
     global trainObj
+    label = np.array([])
+    
     index = len(trainObj['Coffee']) - length_min
     scaler = trainObj['Coffee'][index:]
     label_1 = np.array(scaler[1:])
@@ -255,8 +267,10 @@ def do_training():
 @app.get("/predict_graph")
 def predict_graph():
     global DataTrain
+    print('in')
     Load_Data()
     SetLabel()
+    print('lod')
     res = np.array([])
     nwtwork = Network_running()
     nwtwork.load_model('Model/models/model_LSTM.npz')
@@ -287,7 +301,7 @@ def predict_graph():
             })
 
     return {
-        "data": res_list
+        "data_list": res_list
     }
 
 

@@ -17,7 +17,6 @@ from Model.Network_lstm import Network_training, Network_running
 f = open('API/links.json', 'r')
 Links = json.load(f)
 f.close()
-links_name = list(Links.keys())
 # print(len(Links))
 
 options = webdriver.EdgeOptions()
@@ -47,6 +46,16 @@ def Load_Data():
     global DataToday
     global train_now_date
     global train_now_unix
+    
+    links_name = list(Links.keys())
+    train_now_date = 0
+    train_now_unix = 0
+    trainObj = {}
+    DataTrain = np.array([])
+    DataToday = np.array([])
+    length_min = 0
+    name = None
+
     f = open('Data/' + 'train' + '.json', 'r')
     data = json.load(f)
     f.close()
@@ -88,6 +97,8 @@ def Load_Data():
 def SetLabel():
     global label
     global trainObj
+    label = np.array([])
+
     index = len(trainObj['Coffee']) - length_min
     scaler = trainObj['Coffee'][index:]
     label_1 = np.array(scaler[1:])
