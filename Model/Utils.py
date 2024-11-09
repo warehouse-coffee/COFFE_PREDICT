@@ -34,7 +34,7 @@ def MinMax(array):
 
 
 def MinMax_Negative(array):
-    return 2 * (array - np.min(array)) / (np.max(array) - np.min(array)) - 1
+    return 2 * (array - np.average(array)) / (np.max(array) - np.min(array))
 
 
 def RSI(array, alpha) -> np.ndarray:

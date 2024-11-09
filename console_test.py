@@ -65,14 +65,15 @@ scaler = trainObj['Coffee'][index:]
 label_1 = np.array(scaler[1:])
 label_2 = np.array(scaler[:-1])
 label = label_1 - label_2
+# label = MinMax_Negative(label)
 label = numpy_ewma(label, WindowsTime)
 print(label.shape)
 
-nwtwork = Network_training(trainData, label, 100, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
-res = nwtwork.run(True, 'model')
-while(int(res[1]) < 70):
-    nwtwork = Network_training(trainData, label, 100, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
-    res = nwtwork.run(True, 'model')
+# nwtwork = Network_training(trainData, label, 100, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
+# res = nwtwork.run(True, 'model')
+# while(int(res[1]) < 70):
+#     nwtwork = Network_training(trainData, label, 100, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
+#     res = nwtwork.run(True, 'model')
 
 # pred = res[0]
 # print(pred.shape)
@@ -92,4 +93,5 @@ for Data in trainData:
 res = np.append(res, nwtwork.predict(DataToday))
 plt.plot(res)
 plt.plot(label)
+# plt.plot(MinMax_Negative(trainObj['Coffee'][index:]))
 plt.show()
