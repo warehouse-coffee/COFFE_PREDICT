@@ -35,7 +35,7 @@ name = None
 label = np.array([])
 train_now_date = 0
 train_now_unix = 0
-windowTime= 14
+windowTime = 14
 
 
 def Load_Data():
@@ -46,7 +46,7 @@ def Load_Data():
     global DataToday
     global train_now_date
     global train_now_unix
-    
+
     links_name = list(Links.keys())
     train_now_date = 0
     train_now_unix = 0
@@ -148,7 +148,7 @@ def update():
                 name_split = td[0].find_element(By.CSS_SELECTOR, 'b').get_attribute('innerHTML').strip().split(' ')
                 name = name_split[0]
                 if (len(name_split) > 1):
-                    name = name_split[0] + name_split[1].capitalize()
+                    name = name_split[0] + name_split[1].upper()
                 # READ AND SET VALUE
                 f = open('API/Data_api/' + name + '.json', 'r')
                 data = json.load(f)
@@ -240,11 +240,18 @@ def Training_FUll():
     while accu < 70:
         accu = int(Training())
 
-def Main_func():
-    update()
-    Training_FUll()
 
+def Main_func():
+    print('Start Updating')
+    update()
+    print('Start Training')
+    Training_FUll()
+    print('Finish Training')
+
+
+print('Start Init')
 print(init())
+print('Finish Init')
 
 # schedule.every().day.at("06:00").do(update)
 # schedule.every().day.at("06:20").do(Training_FUll)
