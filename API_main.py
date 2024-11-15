@@ -87,17 +87,21 @@ def Load_Data():
             scaler = scaler[:-1]
             scaler = scaler.reshape((-1, 1))
             DataTrain = np.concatenate((DataTrain, scaler), axis=1)
-    
+
     print(DataTrain.shape)
 
 
 def SetLabel():
     global label
     global trainObj
+    global date_obj_coffee
+    global unix_obj_coffee
     label = np.array([])
-    
+
     index = len(trainObj['Coffee']) - length_min
     scaler = trainObj['Coffee'][index:]
+    date_obj_coffee = trainObj['Coffee_date'][index:]
+    unix_obj_coffee = trainObj['Coffee_unix_ms'][index:]
     label_1 = np.array(scaler[1:])
     label_2 = np.array(scaler[:-1])
     label = label_1 - label_2
@@ -109,35 +113,36 @@ def Training():
     global label
     global train_now_date
     global train_now_unix
-    nwtwork = Network_training(DataTrain, label, 100, 0.01, log=False, now_date=train_now_date, now_unix=train_now_unix)
-    res = nwtwork.run(True, 'model')
-    return res[1]
+    global DataToday
+    nwtwork = Network_training(DataTrain, label, 200, 0.01, log=False, now_date=train_now_date, now_unix=train_now_unix)
+    res = nwtwork.run(today_data=DataToday, isSave=True, filename='model')
+    return res
 
 
-@app.get("/link")
+@app.get("/links")
 def all_Links():
     return Links
 
 
-@app.get("/crawl")
-def crawl(q: Union[str, None] = None):
-    if not Links.get(q):
+@app.get("/crawl_one")
+def crawl_one(product_name: Union[str, None] = None):
+    if not Links.get(product_name):
         return "Don't have data"
     data = {}
     try:
-        f = open('API/Data_api/' + q + '.json', 'r')
+        f = open('API/Data_api/' + product_name + '.json', 'r')
         data = json.load(f)
         f.close()
         now = datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d')
         if (now != data["date_now"]):
-            os.remove('API/Data_api/' + q + '.json')
+            os.remove('API/Data_api/' + product_name + '.json')
             raise Exception("Fetch new Data")
     except:
-        crawl = CrawClass(url=Links.get(q)[0])
+        crawl = CrawClass(url=Links.get(product_name)[0])
         data["unix_time_now"] = int(time.time())
         data["date_now"] = datetime.datetime.fromtimestamp(data["unix_time_now"]).strftime('%Y-%m-%d')
         data["data"] = crawl.Crawl()
-        f = open('API/Data_api/' + q + '.json', 'w')
+        f = open('API/Data_api/' + product_name + '.json', 'w')
         json.dump(data, f)
         f.close()
     return data
@@ -196,113 +201,86 @@ def get_names():
 
 @app.get("/train_status")
 def train_status():
-    try:
-        nwtwork = Network_running()
-        nwtwork.load_model('Model/models/model_LSTM.npz')
-        return nwtwork.get_status()
-    except:
-        return {
-            "error": "cook"
-        }
-
-
-@app.get("/predict_one")
-def predict_one():
-    links_name = list(Links.keys())
-    trainObj = {}
-    DataToday = np.array([])
-    f = open('Data/' + 'train' + '.json', 'r')
+    f = open('Data/' + 'result' + '.json', 'r')
     data = json.load(f)
     f.close()
-    length_min = 0
 
-    for key in links_name:
-        trainObj[key] = [i['value'] for i in data[key]]
-        if length_min == 0:
-            length_min = len(trainObj[key])
-        elif len(trainObj[key]) < 100:
-            links_name.remove(key)
-        elif len(trainObj[key]) < length_min:
-            length_min = len(trainObj[key])
+    accuracy = data['Accuracy']
+    return accuracy
 
-    for key in links_name:
-        if DataToday.size == 0:
-            index = len(trainObj[key]) - length_min
-            scaler = MinMax(trainObj[key][index:])
-            scaler = numpy_ewma(scaler, 7)
-            DataToday = np.array(scaler[-1])
-        else:
-            index = len(trainObj[key]) - length_min
-            scaler = MinMax(trainObj[key][index:])
-            scaler = numpy_ewma(scaler, 7)
-            DataToday = np.append(DataToday, scaler[-1])
 
-    nwtwork = Network_running()
-    nwtwork.load_model('Model/models/model_LSTM.npz')
-    res = nwtwork.predict(DataToday)
-    predict_now_unix = nwtwork.now_unix + 24 * 60 * 60
-    predict_now_date = datetime.datetime.fromtimestamp(predict_now_unix).strftime('%Y-%m-%d')
-    return {
-        "index": index,
-        "date": predict_now_date,
-        "unix_date_ms": predict_now_unix * 1000,
-        "value": res[0][0],
-        "accuracy": nwtwork.accuracy
-    }
+@app.get("/predict_tommorow")
+def predict_tommorow():
+    f = open('Data/' + 'result' + '.json', 'r')
+    data = json.load(f)
+    f.close()
+
+    latest = data['data'][-1]
+    return latest
 
 
 @app.get("/training")
 def do_training():
+    global date_obj_coffee
+    global unix_obj_coffee
     time_taken = time.time()
     Load_Data()
     SetLabel()
-    accu = int(Training())
+    training_data = Training()
+    accu = int(training_data[1])
+    pred = training_data[0]
     print("start training")
     while accu < 70:
-        accu = int(Training())
+        training_data = Training()
+        accu = int(training_data[1])
+        pred = training_data[0]
+
     time_taken = time.time() - time_taken
+
+    # SAVE THE RESULT
+    obj = {
+        "date_now": time.time(),
+        "unix_time_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "accuracy": accu
+    }
+    res_data = []
+    for i in range(len(pred)):
+        if i == len(pred) - 1:
+            message = "Predict value for " + datetime.datetime.fromtimestamp(int(unix_obj_coffee[i] / 1000 + 24 * 60 * 60)).strftime('%Y-%m-%d')
+            res_data.append({
+                "index": i,
+                "AI_predict": pred[i],
+                "Real_price_difference_rate": 0,
+                "Date": date_obj_coffee[i],
+                "unix_date_ms": unix_obj_coffee[i],
+                "message": message
+            })
+        else:
+            res_data.append({
+                "index": i,
+                "AI_predict": pred[i],
+                "Real_price_difference_rate": label[i],
+                "Date": date_obj_coffee[i],
+                "unix_date_ms": unix_obj_coffee[i],
+                "message": "normal value"
+            })
+
+    obj['data'] = res_data
+    f = open('Data/' + 'result' + '.json', 'w')
+    json.dump(obj, f)
+    f.close()
+
     return {"Accuracy": accu, "message": "Done Training", "Time_taken": time_taken, "date": train_now_date, "unix": train_now_unix}
 
 
 @app.get("/predict_graph")
 def predict_graph():
-    global DataTrain
-    print('in')
-    Load_Data()
-    SetLabel()
-    print('lod')
-    res = np.array([])
-    nwtwork = Network_running()
-    nwtwork.load_model('Model/models/model_LSTM.npz')
-    for Data in DataTrain:
-        res = np.append(res, nwtwork.predict(Data))
-    res = np.append(res, nwtwork.predict(DataToday))
-    index = len(trainObj['Coffee']) - length_min
-    date_obj_coffee = trainObj['Coffee_date'][index:]
-    unix_obj_coffee = trainObj['Coffee_unix_ms'][index:]
-    res_list = []
-    for i in range(len(res)):
-        try:
-            res_list.append({
-                "index": i,
-                "value": res[i],
-                "label": label[i],
-                "Date": date_obj_coffee[i],
-                "unix_date_ms": unix_obj_coffee[i]
-            })
-        except:
-            message = "Predict value for " + datetime.datetime.fromtimestamp(int(unix_obj_coffee[i] / 1000 + 24 * 60 * 60)).strftime('%Y-%m-%d')
-            res_list.append({
-                "index": i,
-                "value": res[i],
-                "label": message,
-                "Date": date_obj_coffee[i],
-                "unix_date_ms": unix_obj_coffee[i]
-            })
+    f = open('Data/' + 'result' + '.json', 'r')
+    data = json.load(f)
+    f.close()
 
-    return {
-        "data_list": res_list
-    }
+    all_data = data['data']
+    return all_data
 
 
 @app.get("/London_US")

@@ -12,6 +12,14 @@ def Derrivative(vector):
     return array
 
 
+# Tanh Activation Function
+def Tanh(vector):
+    return np.tanh(vector)
+
+# Derivative of Tanh Activation Function
+def Derivative_Tanh(vector):
+    return 1.0 - np.tanh(vector)**2
+
 class Network_training:
     def __init__(self, datas, labels, epochs, learn_rate, lambd=0.01):
         self.datas = datas.astype('float32')
@@ -21,6 +29,7 @@ class Network_training:
         self.lambd = lambd
 
         # 2 hidden layers
+        # limit = np.sqrt(6 / (input_dim + output_dim))
         self.first_weight = np.random.uniform(-0.5, 0.5, (20, 7))
         self.first_bias = np.zeros((20, 1))
         self.sec_weight = np.random.uniform(-0.5, 0.5, (40, 20))
@@ -42,16 +51,16 @@ class Network_training:
             accuracy = 0
             Cost = 0
             for data, label in zip(self.datas, self.labels):
-                data = data.reshape((7, 1))
+                data = data.reshape((-1, 1))
                 label = np.round(label, 2)
                 label = label.reshape((1, 1))
 
                 # Forward prop
                 pre_First = self.first_weight @ data + self.first_bias
-                first = Relu(pre_First)
+                first = Tanh(pre_First)
 
                 pre_sec = self.sec_weight @ first + self.sec_bias
-                sec = Relu(pre_sec)
+                sec = Tanh(pre_sec)
 
                 res = self.result_weight @ sec + self.result_bias
                 res = np.round(res, 2)
@@ -73,12 +82,12 @@ class Network_training:
                 self.result_weight += -self.learn_rate * DW_3
                 self.result_bias += -self.learn_rate * DZ_3
 
-                DZ_2 = self.result_weight.T @ DZ_3 * Derrivative(pre_sec)  # DZ_2 == DB_2
+                DZ_2 = self.result_weight.T @ DZ_3 * Derivative_Tanh(pre_sec)  # DZ_2 == DB_2
                 DW_2 = DZ_2 @ first.T
                 self.sec_weight += -self.learn_rate * DW_2
                 self.sec_bias += -self.learn_rate * DZ_2
 
-                DZ_1 = self.sec_weight.T @ DZ_2 * Derrivative(pre_First)  # DZ_1 == DB_1
+                DZ_1 = self.sec_weight.T @ DZ_2 * Derivative_Tanh(pre_First)  # DZ_1 == DB_1
                 DW_1 = DZ_1 @ data.T
                 self.first_weight += -self.learn_rate * DW_1
                 self.first_bias += -self.learn_rate * DZ_1

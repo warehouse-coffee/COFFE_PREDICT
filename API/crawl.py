@@ -32,7 +32,7 @@ class CrawClass:
             "index": index,
             "date": self.converDate(index, self.path_list_length)[0],
             "unix_date_ms": self.converDate(index, self.path_list_length)[1] * 1000,
-            "value": self.convertValue(y, self.svg_h, self.labels_y_max, self.labels_y_min)
+            "real_price": self.convertValue(y, self.svg_h, self.labels_y_max, self.labels_y_min)
         }
 
     def converDate(self, index, max_len):

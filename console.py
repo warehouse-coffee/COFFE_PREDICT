@@ -36,7 +36,8 @@ label = np.array([])
 train_now_date = 0
 train_now_unix = 0
 windowTime = 14
-
+date_obj_coffee = np.array([])
+unix_obj_coffee = np.array([])
 
 def Load_Data():
     global DataTrain
@@ -66,6 +67,8 @@ def Load_Data():
         trainObj[key] = [i['value'] for i in data[key]]
         date_key = key + '_date'
         trainObj[date_key] = [i['date'] for i in data[key]]
+        unix_ms_key = key + '_unix_ms'
+        trainObj[unix_ms_key] = [i['unix_date_ms'] for i in data[key]]
         if length_min == 0:
             length_min = len(trainObj[key])
             name = key
@@ -97,10 +100,14 @@ def Load_Data():
 def SetLabel():
     global label
     global trainObj
+    global date_obj_coffee
+    global unix_obj_coffee
     label = np.array([])
 
     index = len(trainObj['Coffee']) - length_min
     scaler = trainObj['Coffee'][index:]
+    date_obj_coffee = trainObj['Coffee_date'][index:]
+    unix_obj_coffee = trainObj['Coffee_unix_ms'][index:]
     label_1 = np.array(scaler[1:])
     label_2 = np.array(scaler[:-1])
     label = label_1 - label_2
@@ -148,7 +155,7 @@ def update():
                 name_split = td[0].find_element(By.CSS_SELECTOR, 'b').get_attribute('innerHTML').strip().split(' ')
                 name = name_split[0]
                 if (len(name_split) > 1):
-                    name = name_split[0] + name_split[1].upper()
+                    name = name_split[0] + name_split[1].upper()[0] + name_split[1][1:]
                 # READ AND SET VALUE
                 f = open('API/Data_api/' + name + '.json', 'r')
                 data = json.load(f)
@@ -219,12 +226,6 @@ def init():
     return "Time_taken:" + str(current)
 
 
-def Training():
-    nwtwork = Network_training(DataTrain, label, 100, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
-    res = nwtwork.run(True, 'model')
-    return res[1]
-
-
 def Running():
     nwtwork = Network_running()
     nwtwork.load_model('Model/models/model_LSTM.npz')
@@ -233,12 +234,58 @@ def Running():
     return res
 
 
+def Training():
+    global DataToday
+    nwtwork = Network_training(DataTrain, label, 200, 0.01, log=True, now_date=train_now_date, now_unix=train_now_unix)
+    res = nwtwork.run(today_data=DataToday, isSave=True, filename='model')
+    return res
+
+
 def Training_FUll():
+    global date_obj_coffee
+    global unix_obj_coffee
+
     Load_Data()
     SetLabel()
-    accu = int(Training())
+    training_data = Training()
+    accu = int(training_data[1])
+    pred = training_data[0]
     while accu < 70:
-        accu = int(Training())
+        training_data = Training()
+        accu = int(training_data[1])
+        pred = training_data[0]
+
+    obj = {
+        "date_now": time.time(),
+        "unix_time_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "accuracy": accu
+    }
+    res_data = []
+    for i in range(len(pred)):
+        if i == len(pred) - 1:
+            message = "Predict value for " + datetime.datetime.fromtimestamp(int(unix_obj_coffee[i] / 1000 + 24 * 60 * 60)).strftime('%Y-%m-%d')
+            res_data.append({
+                "index": i,
+                "AI_predict": pred[i],
+                "Real_price_difference_rate": 0,
+                "Date": date_obj_coffee[i],
+                "unix_date_ms": unix_obj_coffee[i],
+                "message": message
+            })
+        else:
+            res_data.append({
+                "index": i,
+                "AI_predict": pred[i],
+                "Real_price_difference_rate": label[i],
+                "Date": date_obj_coffee[i],
+                "unix_date_ms": unix_obj_coffee[i],
+                "message": "normal value"
+            })
+
+    obj['data'] = res_data
+    f = open('Data/' + 'result' + '.json', 'w')
+    json.dump(obj, f)
+    f.close()
 
 
 def Main_func():
@@ -249,10 +296,7 @@ def Main_func():
     print('Finish Training')
 
 
-print('Start Init')
 print(init())
-print('Finish Init')
-
 # schedule.every().day.at("06:00").do(update)
 # schedule.every().day.at("06:20").do(Training_FUll)
 schedule.every().day.at("06:00").do(Main_func)
