@@ -38,7 +38,7 @@ class CrawClass:
     def converDate(self, index, max_len):
         date_unix = int(time.time())
         date_unix = date_unix - (date_unix % 86400)
-        scale = (max_len - index) * 363 / max_len
+        scale = (max_len - index - 1) * 363 / max_len
         date_unix = date_unix - int(scale) * 86400
         date = datetime.datetime.fromtimestamp(date_unix).strftime('%Y-%m-%d')
         return [date, date_unix]

@@ -56,7 +56,7 @@ def Load_Data():
     train_now_unix = data['unix_time_now']
 
     for key in links_name:
-        trainObj[key] = [i['value'] for i in data[key]]
+        trainObj[key] = [i['real_price'] for i in data[key]]
         date_key = key + '_date'
         trainObj[date_key] = [i['date'] for i in data[key]]
         unix_ms_key = key + '_unix_ms'
@@ -205,8 +205,12 @@ def train_status():
     data = json.load(f)
     f.close()
 
-    accuracy = data['Accuracy']
-    return accuracy
+    accuracy = data['accuracy']
+    date = data['date_now']
+    return {
+        "accuracy": accuracy,
+        "date": date
+    }
 
 
 @app.get("/predict_tommorow")
@@ -239,8 +243,8 @@ def do_training():
 
     # SAVE THE RESULT
     obj = {
-        "date_now": time.time(),
-        "unix_time_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "date_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "unix_time_now": time.time(),
         "accuracy": accu
     }
     res_data = []

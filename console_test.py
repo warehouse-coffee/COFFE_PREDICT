@@ -27,7 +27,7 @@ train_now_unix = data['unix_time_now']
 WindowsTime = 14
 
 for key in links_name:
-    trainObj[key] = [i['value'] for i in data[key]]
+    trainObj[key] = [i['real_price'] for i in data[key]]
     date_key = key + '_date'
     trainObj[date_key] = [i['date'] for i in data[key]]
     unix_ms_key = key + '_unix_ms'

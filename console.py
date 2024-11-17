@@ -60,11 +60,9 @@ def Load_Data():
     f = open('Data/' + 'train' + '.json', 'r')
     data = json.load(f)
     f.close()
-    train_now_date = data['date_now']
-    train_now_unix = data['unix_time_now']
 
     for key in links_name:
-        trainObj[key] = [i['value'] for i in data[key]]
+        trainObj[key] = [i['real_price'] for i in data[key]]
         date_key = key + '_date'
         trainObj[date_key] = [i['date'] for i in data[key]]
         unix_ms_key = key + '_unix_ms'
@@ -119,7 +117,7 @@ def Datapoint(index, value, time_s):
         "index": index,
         "date": datetime.datetime.fromtimestamp(time_s).strftime('%Y-%m-%d'),
         "unix_date_ms": time_s * 1000,
-        "value": value
+        "real_price": value
     }
 
 
@@ -256,8 +254,8 @@ def Training_FUll():
         pred = training_data[0]
 
     obj = {
-        "date_now": time.time(),
-        "unix_time_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "date_now": datetime.datetime.fromtimestamp(int(time.time())).strftime('%Y-%m-%d'),
+        "unix_time_now": time.time(),
         "accuracy": accu
     }
     res_data = []
