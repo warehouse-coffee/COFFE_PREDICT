@@ -29,6 +29,7 @@ label = np.array([])
 windowTime = 14
 train_now_date = 0
 train_now_unix = 0
+real_price_coffee = np.array([])
 
 
 def Load_Data():
@@ -96,12 +97,15 @@ def SetLabel():
     global trainObj
     global date_obj_coffee
     global unix_obj_coffee
+    global real_price_coffee
     label = np.array([])
 
     index = len(trainObj['Coffee']) - length_min
     scaler = trainObj['Coffee'][index:]
     date_obj_coffee = trainObj['Coffee_date'][index:]
     unix_obj_coffee = trainObj['Coffee_unix_ms'][index:]
+    real_price_coffee = np.array(scaler)
+
     label_1 = np.array(scaler[1:])
     label_2 = np.array(scaler[:-1])
     label = label_1 - label_2
@@ -227,6 +231,7 @@ def predict_tommorow():
 def do_training():
     global date_obj_coffee
     global unix_obj_coffee
+    global real_price_coffee
     time_taken = time.time()
     Load_Data()
     SetLabel()
@@ -255,6 +260,8 @@ def do_training():
                 "index": i,
                 "AI_predict": pred[i],
                 "Real_price_difference_rate": 0,
+                "AI_predict_money": real_price_coffee[i] + pred[i],
+                "Real_price_money": real_price_coffee[i],
                 "Date": date_obj_coffee[i],
                 "unix_date_ms": unix_obj_coffee[i],
                 "message": message
@@ -264,6 +271,8 @@ def do_training():
                 "index": i,
                 "AI_predict": pred[i],
                 "Real_price_difference_rate": label[i],
+                "AI_predict_money": real_price_coffee[i + 1] - pred[i],
+                "Real_price_money": real_price_coffee[i],
                 "Date": date_obj_coffee[i],
                 "unix_date_ms": unix_obj_coffee[i],
                 "message": "normal value"
