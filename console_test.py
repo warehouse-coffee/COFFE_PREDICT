@@ -137,8 +137,10 @@ labels = []
 for i in range(len(data['data'])):
     values.append(data['data'][i]['AI_predict'])
     labels.append(data['data'][i]['Real_price_difference_rate'])
-
-plt.plot(values)
-plt.plot(labels[:-1])
+print(labels[0])
+labels = MinMax_Negative(labels)
+print(labels[0])
+plt.plot(MinMax_Negative(values))
+plt.plot(labels)
 plt.plot(np.zeros(len(labels)))
 plt.show()

@@ -246,6 +246,7 @@ def Training_FUll():
     global date_obj_coffee
     global unix_obj_coffee
     global real_price_coffee
+    global label
 
     Load_Data()
     SetLabel()
@@ -263,6 +264,8 @@ def Training_FUll():
         "accuracy": accu
     }
     res_data = []
+    pred = MinMax_Negative(pred)
+    label = MinMax_Negative(label)
     for i in range(len(pred)):
         if i == len(pred) - 1:
             message = "Predict value for " + datetime.datetime.fromtimestamp(int(unix_obj_coffee[i] / 1000 + 24 * 60 * 60)).strftime('%Y-%m-%d')
